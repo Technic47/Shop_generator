@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: Generator
+
+logging:
+  level:
+    org.springframework.security: TRACE
+
+web:
+  client:
+    retry: 300
+    max-attempts: 3

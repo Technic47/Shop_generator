@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  generator_module:
+    env_file:
+      - "../.env"
+    build:
+      context: .
+    container_name: generator_module
+    restart: always
+    ports:
+      - "9980:9980"
+    environment:
+      MODULE_GROUP_ID: GATE_GROUP_ID
+

@@ -1,0 +1,18 @@
+package ru.kuznetsov.shop.generator.common;
+
+public interface ConstValues {
+
+    String AUTH_URI = "/auth";
+    String ADDRESS_URI = "/address";
+    String PRODUCT_URI = "/product";
+    String PRODUCT_CATEGORY_URI = "/product-category";
+    String STOCK_URI = "/stock";
+    String STORE_URI = "/store";
+    String OPERATION_URI = "/operation";
+    String ORDER_URI = "/order";
+    String ORDER_STATUS_URI = "/order/status";
+    String ORDER_BUCKET_URI = "/order/bucket";
+
+    String ADMIN_LOGIN = "shop_admin";
+    String ADMIN_PASSWORD = "admin";
+}
