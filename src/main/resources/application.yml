@@ -2,11 +2,17 @@ spring:
   application:
     name: Generator
 
+
 logging:
   level:
     org.springframework.security: TRACE
+
+microservices:
+  baseUrl: ${BASE_URL}
 
 web:
   client:
     retry: 300
     max-attempts: 3
+server:
+  port: 9980

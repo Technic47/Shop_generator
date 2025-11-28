@@ -15,4 +15,8 @@ public interface ConstValues {
 
     String ADMIN_LOGIN = "shop_admin";
     String ADMIN_PASSWORD = "admin";
+    String USER_LOGIN = "shop_user";
+    String USER_PASSWORD = "1999";
+    String SELLER_LOGIN = "shop_seller";
+    String SELLER_PASSWORD = "1999";
 }

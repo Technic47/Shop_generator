@@ -18,8 +18,7 @@ public interface UseCase<T> {
 
     Object getBody();
 
-    default Class<T> getReturnTypeClass(){
-        return ((Class) ((ParameterizedType) getClass()
-                .getGenericSuperclass()).getActualTypeArguments()[0]);
+    default Class<T> getReturnTypeClass() {
+        return ((Class) ((ParameterizedType) getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0]);
     }
 }
