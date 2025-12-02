@@ -6,6 +6,7 @@ import ru.kuznetsov.shop.generator.usecase.UseCase;
 import ru.kuznetsov.shop.represent.dto.util.ProductCardPage;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,19 +18,19 @@ public class GetProductCardsUseCasePageable implements UseCase<ProductCardPage> 
     private final String token;
     private final UUID ownerId;
     private final Long categoryId;
-    private final Integer pageNum;
+    private final Integer pageNumber;
     private final Integer pageSize;
     private final String sortBy;
-    private final String sortDirection;
+    private final String order;
 
-    public GetProductCardsUseCasePageable(String token, UUID ownerId, Long categoryId, Integer pageNum, Integer pageSize, String sortBy, String sortDirection) {
+    public GetProductCardsUseCasePageable(String token, UUID ownerId, Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String order) {
         this.token = token;
         this.ownerId = ownerId;
         this.categoryId = categoryId;
-        this.pageNum = pageNum;
+        this.pageNumber = pageNumber;
         this.pageSize = pageSize;
         this.sortBy = sortBy;
-        this.sortDirection = sortDirection;
+        this.order = order;
     }
 
     @Override
@@ -44,14 +45,16 @@ public class GetProductCardsUseCasePageable implements UseCase<ProductCardPage> 
 
     @Override
     public Map<String, ?> getQueryParams() {
-        return Map.of(
-                "ownerId", ownerId,
-                "categoryId", categoryId,
-                "pageNum", pageNum,
-                "pageSize", pageSize,
-                "sortBy", sortBy,
-                "sortDirection", sortDirection
-        );
+        Map<String, Object> queryParams = new HashMap<>(Collections.emptyMap());
+
+        if (ownerId != null) queryParams.put("ownerId", ownerId);
+        if (categoryId != null) queryParams.put("categoryId", categoryId);
+        if (pageNumber != null) queryParams.put("pageNumber", pageNumber);
+        if (pageSize != null) queryParams.put("pageSize", pageSize);
+        if (sortBy != null) queryParams.put("sortBy", sortBy);
+        if (order != null) queryParams.put("order", order);
+
+        return queryParams;
     }
 
     @Override
