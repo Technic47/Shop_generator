@@ -8,25 +8,22 @@ import ru.kuznetsov.shop.represent.dto.ProductDto;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static ru.kuznetsov.shop.generator.common.ConstValues.PRODUCT_URI;
 
-public class GetProductsByCategoryAndOwnerUseCase implements UseCase<ProductDto> {
+public class CreateProductBatchUseCase implements UseCase<ProductDto> {
 
     private final String token;
-    private final UUID ownerId;
-    private final Long categoryId;
+    private final ProductDto[] productList;
 
-    public GetProductsByCategoryAndOwnerUseCase(String token, UUID ownerId, Long categoryId) {
+    public CreateProductBatchUseCase(String token, ProductDto[] productList) {
         this.token = token;
-        this.ownerId = ownerId;
-        this.categoryId = categoryId;
+        this.productList = productList;
     }
 
     @Override
     public String getUri() {
-        return PRODUCT_URI;
+        return PRODUCT_URI + "/batch";
     }
 
     @Override
@@ -36,10 +33,7 @@ public class GetProductsByCategoryAndOwnerUseCase implements UseCase<ProductDto>
 
     @Override
     public Map<String, ?> getQueryParams() {
-        return Map.of(
-                "ownerId", ownerId,
-                "categoryId", categoryId
-        );
+        return Map.of();
     }
 
     @Override
@@ -49,6 +43,6 @@ public class GetProductsByCategoryAndOwnerUseCase implements UseCase<ProductDto>
 
     @Override
     public Object getBody() {
-        return null;
+        return productList;
     }
 }

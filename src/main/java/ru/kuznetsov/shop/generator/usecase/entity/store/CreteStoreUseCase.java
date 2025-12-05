@@ -5,22 +5,20 @@ import org.springframework.http.HttpMethod;
 import ru.kuznetsov.shop.generator.usecase.UseCase;
 import ru.kuznetsov.shop.represent.dto.StoreDto;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static ru.kuznetsov.shop.generator.common.ConstValues.STORE_URI;
 
-public class GetAllStoresUseCase implements UseCase<StoreDto> {
+public class CreteStoreUseCase implements UseCase<StoreDto> {
 
     private final String token;
-    private final UUID ownerId;
-    private final Long addressId;
-    private final String name;
+    private final StoreDto storeDto;
 
-    public GetAllStoresUseCase(String token, UUID ownerId, Long addressId, String name) {
+    public CreteStoreUseCase(String token, StoreDto storeDto) {
         this.token = token;
-        this.ownerId = ownerId;
-        this.addressId = addressId;
-        this.name = name;
+        this.storeDto = storeDto;
     }
 
     @Override
@@ -30,18 +28,12 @@ public class GetAllStoresUseCase implements UseCase<StoreDto> {
 
     @Override
     public HttpMethod getMethod() {
-        return HttpMethod.GET;
+        return HttpMethod.POST;
     }
 
     @Override
     public Map<String, ?> getQueryParams() {
-        Map<String, Object> queryParams = new HashMap<>(Collections.emptyMap());
-
-        if (ownerId != null) queryParams.put("ownerId", ownerId);
-        if (addressId != null) queryParams.put("addressId", addressId);
-        if (name != null) queryParams.put("name", name);
-
-        return queryParams;
+        return Map.of();
     }
 
     @Override
@@ -51,6 +43,6 @@ public class GetAllStoresUseCase implements UseCase<StoreDto> {
 
     @Override
     public Object getBody() {
-        return null;
+        return storeDto;
     }
 }

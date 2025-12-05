@@ -1,4 +1,4 @@
-package ru.kuznetsov.shop.generator.scenario.entity.order;
+package ru.kuznetsov.shop.generator.scenario.user.order;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +22,7 @@ import ru.kuznetsov.shop.represent.dto.util.ProductCardPage;
 
 import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.ADMIN_LOGIN;
-import static ru.kuznetsov.shop.generator.common.ConstValues.ADMIN_PASSWORD;
+import static ru.kuznetsov.shop.generator.common.ConstValues.*;
 import static ru.kuznetsov.shop.represent.enums.DeliveryType.ADDRESS;
 import static ru.kuznetsov.shop.represent.enums.PaymentType.CASH;
 
@@ -40,7 +39,7 @@ public class CreateOrderScenario extends AbstractScenario {
     public void run() {
         logger.info("Start CreateOrderScenario");
 
-        TokenDto token = getToken();
+        TokenDto token = getToken(USER_LOGIN, USER_PASSWORD);
         String tokenString = token.getToken();
 
         List<ProductCategoryDto> productCategoryDtos = getProductCategories(tokenString);
@@ -104,7 +103,7 @@ public class CreateOrderScenario extends AbstractScenario {
 
     private List<StoreDto> getStoreList(String tokenString) {
         logger.info("Getting store list");
-        List<StoreDto> storeDtos = runUseCaseWithReturn(new GetAllStoresUseCase(tokenString));
+        List<StoreDto> storeDtos = runUseCaseWithReturn(new GetAllStoresUseCase(tokenString, null, null, null));
         logger.info("Store List: {}", storeDtos.stream()
                 .map(StoreDto::getName)
                 .toList());

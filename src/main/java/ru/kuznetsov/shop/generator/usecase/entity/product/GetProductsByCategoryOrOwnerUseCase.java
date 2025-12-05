@@ -1,31 +1,29 @@
-package ru.kuznetsov.shop.generator.usecase.entity.store;
+package ru.kuznetsov.shop.generator.usecase.entity.product;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import ru.kuznetsov.shop.generator.usecase.UseCase;
-import ru.kuznetsov.shop.represent.dto.StoreDto;
+import ru.kuznetsov.shop.represent.dto.ProductDto;
 
 import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.STORE_URI;
+import static ru.kuznetsov.shop.generator.common.ConstValues.PRODUCT_URI;
 
-public class GetAllStoresUseCase implements UseCase<StoreDto> {
+public class GetProductsByCategoryOrOwnerUseCase implements UseCase<ProductDto> {
 
     private final String token;
     private final UUID ownerId;
-    private final Long addressId;
-    private final String name;
+    private final Long categoryId;
 
-    public GetAllStoresUseCase(String token, UUID ownerId, Long addressId, String name) {
+    public GetProductsByCategoryOrOwnerUseCase(String token, UUID ownerId, Long categoryId) {
         this.token = token;
         this.ownerId = ownerId;
-        this.addressId = addressId;
-        this.name = name;
+        this.categoryId = categoryId;
     }
 
     @Override
     public String getUri() {
-        return STORE_URI;
+        return PRODUCT_URI;
     }
 
     @Override
@@ -38,8 +36,7 @@ public class GetAllStoresUseCase implements UseCase<StoreDto> {
         Map<String, Object> queryParams = new HashMap<>(Collections.emptyMap());
 
         if (ownerId != null) queryParams.put("ownerId", ownerId);
-        if (addressId != null) queryParams.put("addressId", addressId);
-        if (name != null) queryParams.put("name", name);
+        if (categoryId != null) queryParams.put("categoryId", categoryId);
 
         return queryParams;
     }
