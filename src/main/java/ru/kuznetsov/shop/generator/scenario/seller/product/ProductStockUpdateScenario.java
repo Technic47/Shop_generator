@@ -9,6 +9,7 @@ import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.address.CreteAddressUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.CreateProductBatchUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.GetProductsByCategoryOrOwnerUseCase;
+import ru.kuznetsov.shop.generator.usecase.entity.product_category.CreateCategoryUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product_category.GetAllCategoriesUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.CreateStockUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.GetStockUseCase;
@@ -29,6 +30,7 @@ import static ru.kuznetsov.shop.generator.common.ConstValues.*;
 public class ProductStockUpdateScenario extends AbstractScenario {
 
     private static final int STORE_AMOUNT = 2;
+    private static final int CATEGORY_AMOUNT = 3;
     private static final int PRODUCT_AMOUNT = 10;
     private static final int STORE_MAX_AMOUNT = 150;
 
@@ -50,7 +52,14 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         UUID userId = userDto.getId();
 
         List<StoreDto> storeList = new ArrayList<>(getStoreList(tokenString, userId));
-        List<String> categoryIdList = getProductCategories(tokenString).stream()
+        List<ProductCategoryDto> productCategories = getProductCategories(tokenString);
+
+        //Добавить категорий, если отсутствуют
+        if (productCategories.isEmpty()) {
+            productCategories = createProductCategories(tokenString, CATEGORY_AMOUNT);
+        }
+
+        List<String> categoryIdList = productCategories.stream()
                 .map(ProductCategoryDto::getName)
                 .toList();
 
@@ -161,12 +170,35 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         return productCategoryDtos;
     }
 
+    private List<ProductCategoryDto> createProductCategories(String tokenString, int amount) {
+        logger.info("Creating product categories");
+
+        List<ProductCategoryDto> categoryDtoList = new ArrayList<>();
+
+        for (int i = 0; i < amount; i++) {
+            categoryDtoList.add(
+                    runUseCaseWithReturn(new CreateCategoryUseCase(tokenString,createProductCategory())).get(0)
+            );
+        }
+
+        return categoryDtoList;
+    }
+
     private List<StockDto> getStockList(String tokenString, Long storeId, Long productId) {
         logger.info("Getting Stock List for store {} and product {}", storeId, productId);
         List<StockDto> stockDtos = runUseCaseWithReturn(new GetStockUseCase(tokenString, storeId, productId));
 
         logger.info("Stock found: x{}", stockDtos.size());
         return stockDtos;
+    }
+
+    private ProductCategoryDto createProductCategory() {
+        Random random = new Random();
+
+        return new ProductCategoryDto(
+                "Сгенерированная категория - " + random.nextInt(1000),
+                "Сгенерировано генератором"
+        );
     }
 
     private StockDto createStock(String tokenString, String storeName, Long productId, int amount) {
@@ -179,7 +211,8 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                 null,
                 storeName,
                 null,
-                false
+                false,
+                null
         );
 
         StockDto stock = runUseCaseWithReturn(new CreateStockUseCase(tokenString, stockDto)).get(0);

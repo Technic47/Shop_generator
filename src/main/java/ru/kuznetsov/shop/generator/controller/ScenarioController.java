@@ -22,7 +22,7 @@ public class ScenarioController {
     Logger logger = LoggerFactory.getLogger(ScenarioController.class);
 
     @PostMapping
-    public ResponseEntity<Boolean> runGetAllAddress(
+    public ResponseEntity<Boolean> runScenario(
             @RequestParam String scenario
     ) {
         try {
