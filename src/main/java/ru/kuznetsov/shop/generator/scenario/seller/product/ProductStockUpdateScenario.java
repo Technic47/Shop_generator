@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
-import ru.kuznetsov.shop.generator.service.UseCaseService;
+import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.address.CreteAddressUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.CreateProductBatchUseCase;
@@ -36,12 +36,14 @@ public class ProductStockUpdateScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
 
-    protected ProductStockUpdateScenario(UseCaseService useCaseService) {
-        super(useCaseService);
+    protected ProductStockUpdateScenario(GateUseCaseService gateUseCaseService) {
+        super(gateUseCaseService);
     }
 
     @Override
     public void run() {
+        logger.info("Start CreateProductStockScenario");
+
         TokenDto token = getToken(SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
@@ -99,6 +101,8 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                 }
             }
         }
+
+        logger.info("Finished CreateProductStockScenario");
     }
 
     private List<StoreDto> getStoreList(String tokenString, UUID ownerId) {

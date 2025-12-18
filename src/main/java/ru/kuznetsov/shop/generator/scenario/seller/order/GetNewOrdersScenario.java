@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.scenario.seller.product.ProductStockUpdateScenario;
-import ru.kuznetsov.shop.generator.service.UseCaseService;
+import ru.kuznetsov.shop.generator.service.GateUseCaseService;
+import ru.kuznetsov.shop.generator.service.NotificationUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.GetStockByReservationOrderIdUseCase;
+import ru.kuznetsov.shop.generator.usecase.notification.DeleteNotificationUseCase;
 import ru.kuznetsov.shop.generator.usecase.notification.GetNotificationByOwnerIdUseCase;
 import ru.kuznetsov.shop.represent.dto.StockDto;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
@@ -30,14 +32,19 @@ public class GetNewOrdersScenario extends AbstractScenario {
 
     private String errorString;
 
+    protected final NotificationUseCaseService notificationUseCaseService;
+
     Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
 
-    protected GetNewOrdersScenario(UseCaseService useCaseService) {
-        super(useCaseService);
+    protected GetNewOrdersScenario(GateUseCaseService gateUseCaseService, NotificationUseCaseService notificationUseCaseService) {
+        super(gateUseCaseService);
+        this.notificationUseCaseService = notificationUseCaseService;
     }
 
     @Override
     public void run() {
+        logger.info("Start GetNewOrdersScenario");
+
         TokenDto token = getToken(SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
@@ -46,14 +53,14 @@ public class GetNewOrdersScenario extends AbstractScenario {
         logger.info("UserInfo: {}", userDto);
 
         logger.info("Getting new order notifications");
-        List<SellerNotificationDto> notifications = runUseCaseWithReturn(new GetNotificationByOwnerIdUseCase(userDto.getId().toString()));
+        List<SellerNotificationDto> notifications = notificationUseCaseService.runUseCase(new GetNotificationByOwnerIdUseCase(userDto.getId().toString()));
         logger.info("New notifications: {}", notifications.size());
 
         for (SellerNotificationDto notification : notifications) {
             Long orderId = notification.getOrderId();
 
             List<Boolean> list = notification.getProducts().stream()
-                    .map(product -> stockCheck(tokenString, orderId, product))
+                    .map(bucket -> stockCheck(tokenString, orderId, bucket))
                     .toList();
 
             OrderStatusDto orderStatus;
@@ -72,53 +79,68 @@ public class GetNewOrdersScenario extends AbstractScenario {
                         "Order ready",
                         orderId
                 );
+
+                notificationUseCaseService.runUseCase(new DeleteNotificationUseCase(notification.getId()));
             }
 
             runUseCase(new SaveOrderStatusUseCase(tokenString, orderStatus));
         }
+
+        logger.info("Finished GetNewOrdersScenario");
     }
 
-    private boolean stockCheck(String tokenString, Long orderId, BucketItemDto product) {
-        logger.info("Start stock checking for product: {}", product.getId());
-
+    private boolean stockCheck(String tokenString, Long orderId, BucketItemDto bucket) {
         boolean stockCheck = true;
         boolean reservationCheck = true;
         boolean amountCheck = true;
-        StringBuilder builder = new StringBuilder();
-        List<StockDto> stockList = runUseCaseWithReturn(new GetStockByReservationOrderIdUseCase(tokenString, orderId));
 
+        Long bucketId = bucket.getId();
+        Long productId = bucket.getProductId();
+        Integer bucketAmount = bucket.getAmount();
+        StringBuilder builder = new StringBuilder();
+
+        logger.info("Start stock checking for bucket: {}", bucketId);
+
+        List<StockDto> stockList = runUseCaseWithReturn(new GetStockByReservationOrderIdUseCase(tokenString, orderId)).stream()
+                .filter(stock -> stock.getProductId().equals(productId))
+                .toList();
+
+        //Проверка на наличие запаса на складе
         if (stockList.isEmpty()) {
             stockCheck = false;
-            logger.info("No stock found for productId: {}", product.getId());
-            builder.append("No stock found for productId: ").append(product.getId());
+            logger.info("No stock found for productId: {}", bucketId);
+            builder.append("No stock found for productId: ").append(bucketId);
         } else {
+
             reservationCheck = stockList.stream()
                     .filter(stock -> stock.getIsReserved().equals(false))
                     .toList()
                     .isEmpty();
 
+            //Проверка на то, что везде проставлен резерв
             if (!reservationCheck) {
                 builder.append(" ");
-                logger.info("Stock found for orderId: {} is not fully reserved for productId: {}", orderId, product.getId());
-                builder.append("Stock found for orderId: ").append(orderId).append(" is not fully reserved for productId: ").append(product.getId());
+                logger.info("Stock found for orderId: {} is not correctly reserved for productId: {}", orderId, bucketId);
+                builder.append("Stock found for orderId: ").append(orderId).append(" is not correctly reserved for productId: ").append(bucketId);
             }
 
-            int stockSum = stockList.stream()
-                    .mapToInt(StockDto::getAmount)
-                    .sum();
+            List<Integer> reservedAmountList = stockList.stream()
+                    .map(StockDto::getAmount)
+                    .toList();
 
-            amountCheck = product.getAmount().equals(stockSum);
+            amountCheck = reservedAmountList.contains(bucketAmount);
 
+            //Проверка на то, что зарезервировано достаточное количество
             if (!amountCheck) {
                 builder.append(" ");
-                logger.info("Stock amount reserved for orderId: {} is not fully reserved for productId: {}", orderId, product.getId());
-                builder.append("Stock amount reserved for productId: ").append(product.getId()).append(" is not fully reserved for productId: ").append(product.getId());
+                logger.info("Stock amount reserved for orderId: {} is not fully reserved for productId: {}", orderId, bucketId);
+                builder.append("Stock amount reserved for productId: ").append(bucketId).append(" is not fully reserved for productId: ").append(bucketId);
             }
         }
         boolean checkResult = stockCheck && reservationCheck && amountCheck;
         errorString = checkResult ? null : builder.toString();
 
-        logger.info("Finished stock checking for product: {} with result: {}", product.getId(), checkResult);
+        logger.info("Finished stock checking for bucket: {} with result: {}", bucketId, checkResult);
         return checkResult;
     }
 

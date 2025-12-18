@@ -4,8 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
-import ru.kuznetsov.shop.generator.service.UseCaseService;
-import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
+import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.SaveOrderUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.GetProductCardsUseCasePageable;
@@ -22,7 +21,8 @@ import ru.kuznetsov.shop.represent.dto.util.ProductCardPage;
 
 import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.*;
+import static ru.kuznetsov.shop.generator.common.ConstValues.USER_LOGIN;
+import static ru.kuznetsov.shop.generator.common.ConstValues.USER_PASSWORD;
 import static ru.kuznetsov.shop.represent.enums.DeliveryType.ADDRESS;
 import static ru.kuznetsov.shop.represent.enums.PaymentType.CASH;
 
@@ -31,8 +31,8 @@ public class CreateOrderScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(CreateOrderScenario.class);
 
-    protected CreateOrderScenario(UseCaseService useCaseService) {
-        super(useCaseService);
+    protected CreateOrderScenario(GateUseCaseService gateUseCaseService) {
+        super(gateUseCaseService);
     }
 
     @Override
@@ -82,13 +82,6 @@ public class CreateOrderScenario extends AbstractScenario {
         logger.info("Order saved: {}", savedOrder);
 
         logger.info("Finished CreateOrderScenario");
-    }
-
-    private TokenDto getToken() {
-        logger.info("Getting token");
-        TokenDto token = runUseCaseWithReturn(new GetTokenUseCase(ADMIN_LOGIN, ADMIN_PASSWORD)).get(0);
-        logger.info("Token String: {}", token.getToken());
-        return token;
     }
 
     private List<ProductCategoryDto> getProductCategories(String tokenString) {
