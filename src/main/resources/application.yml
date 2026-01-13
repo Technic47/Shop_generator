@@ -15,4 +15,4 @@ web:
     retry: 300
     max-attempts: 3
 server:
-  port: 9980
+  port: 9988

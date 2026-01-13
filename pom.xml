@@ -6,12 +6,12 @@
     <parent>
         <groupId>io.github.technic47</groupId>
         <artifactId>shop-spring-boot-starter</artifactId>
-        <version>1.0.29</version>
+        <version>1.0.30</version>
     </parent>
 
     <groupId>ru.kuznetsov.shop</groupId>
     <artifactId>generator</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>Generator</name>
     <description>Generator</description>
 

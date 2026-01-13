@@ -79,7 +79,7 @@ public class CreateOrderScenario extends AbstractScenario {
         orderDto.setBucket(bucketList);
 
         OrderDto savedOrder = runUseCaseWithReturn(new SaveOrderUseCase(tokenString, orderDto)).get(0);
-        logger.info("Order saved: {}", savedOrder);
+        logger.info("Order saved: {}", savedOrder.getId());
 
         logger.info("Finished CreateOrderScenario");
     }

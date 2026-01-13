@@ -28,7 +28,7 @@ import static ru.kuznetsov.shop.represent.enums.OrderStatusType.ERROR;
 import static ru.kuznetsov.shop.represent.enums.OrderStatusType.FORMED;
 
 @Component
-public class GetNewOrdersScenario extends AbstractScenario {
+public class ProcessNewOrdersScenario extends AbstractScenario {
 
     private String errorString;
 
@@ -36,7 +36,7 @@ public class GetNewOrdersScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
 
-    protected GetNewOrdersScenario(GateUseCaseService gateUseCaseService, NotificationUseCaseService notificationUseCaseService) {
+    protected ProcessNewOrdersScenario(GateUseCaseService gateUseCaseService, NotificationUseCaseService notificationUseCaseService) {
         super(gateUseCaseService);
         this.notificationUseCaseService = notificationUseCaseService;
     }
@@ -66,6 +66,8 @@ public class GetNewOrdersScenario extends AbstractScenario {
             OrderStatusDto orderStatus;
 
             if (list.contains(false)) {
+                logger.warn("Order {} checking false. Set status ERROR", orderId);
+
                 orderStatus = createOrderStatus(
                         ERROR,
                         userDto.getId().toString(),
@@ -73,6 +75,8 @@ public class GetNewOrdersScenario extends AbstractScenario {
                         orderId
                 );
             } else {
+                logger.info("Order {} checking true. Set status FORMED", orderId);
+
                 orderStatus = createOrderStatus(
                         FORMED,
                         userDto.getId().toString(),
@@ -124,11 +128,15 @@ public class GetNewOrdersScenario extends AbstractScenario {
                 builder.append("Stock found for orderId: ").append(orderId).append(" is not correctly reserved for productId: ").append(bucketId);
             }
 
-            List<Integer> reservedAmountList = stockList.stream()
-                    .map(StockDto::getAmount)
-                    .toList();
+//            List<Integer> reservedAmountList = stockList.stream()
+//                    .map(StockDto::getAmount)
+//                    .toList();
 
-            amountCheck = reservedAmountList.contains(bucketAmount);
+            Integer reservedStockSum = stockList.stream()
+                    .map(StockDto::getAmount)
+                    .reduce(0, Integer::sum);
+
+            amountCheck = reservedStockSum >= bucketAmount;
 
             //Проверка на то, что зарезервировано достаточное количество
             if (!amountCheck) {

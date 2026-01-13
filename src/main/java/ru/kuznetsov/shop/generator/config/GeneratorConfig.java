@@ -16,6 +16,7 @@ public class GeneratorConfig {
 
     private final static String GATE_PORT = "8080";
     private final static String NOTIFICATION_STAB_PORT = "8088";
+    private final static String PAYMENT_MODULE_PORT = "9087";
 
     @Bean
     @Qualifier("gate")
@@ -27,6 +28,12 @@ public class GeneratorConfig {
     @Qualifier("notification")
     public WebClient getNotificationClient() {
         return getWebClient(NOTIFICATION_STAB_PORT);
+    }
+
+    @Bean
+    @Qualifier("payment")
+    public WebClient getPaymentClient() {
+        return getWebClient(PAYMENT_MODULE_PORT);
     }
 
     private WebClient getWebClient(String port) {
