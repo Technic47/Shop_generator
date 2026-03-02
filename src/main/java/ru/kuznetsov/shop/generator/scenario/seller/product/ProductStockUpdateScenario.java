@@ -42,7 +42,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
 
     @Override
     public void run() {
-        logger.info("Start CreateProductStockScenario");
+        logger.info("Start ProductStockUpdateScenario");
 
         TokenDto token = getToken(SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
@@ -102,7 +102,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
             }
         }
 
-        logger.info("Finished CreateProductStockScenario");
+        logger.info("Finished ProductStockUpdateScenario");
     }
 
     private List<StoreDto> getStoreList(String tokenString, UUID ownerId) {
