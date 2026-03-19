@@ -6,9 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@EnableScheduling
 public class GeneratorConfig {
 
     @Value("${microservices.baseUrl}")
@@ -17,6 +19,7 @@ public class GeneratorConfig {
     private final static String GATE_PORT = "8080";
     private final static String NOTIFICATION_STAB_PORT = "8088";
     private final static String PAYMENT_MODULE_PORT = "9087";
+    private final static String SHIPMENT_MODULE_PORT = "9088";
 
     @Bean
     @Qualifier("gate")
@@ -34,6 +37,12 @@ public class GeneratorConfig {
     @Qualifier("payment")
     public WebClient getPaymentClient() {
         return getWebClient(PAYMENT_MODULE_PORT);
+    }
+
+    @Bean
+    @Qualifier("shipment")
+    public WebClient getShipmentClient() {
+        return getWebClient(SHIPMENT_MODULE_PORT);
     }
 
     private WebClient getWebClient(String port) {

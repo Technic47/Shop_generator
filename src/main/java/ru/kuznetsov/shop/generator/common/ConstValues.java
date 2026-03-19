@@ -14,6 +14,7 @@ public interface ConstValues {
     String ORDER_BUCKET_URI = "/order/bucket";
     String NOTIFICATION_URI = "/notification";
     String PAYMENT_URI = "/payment";
+    String SHIPMENT_URI = "/shipment";
 
     String ADMIN_LOGIN = "shop_admin";
     String ADMIN_PASSWORD = "admin";
