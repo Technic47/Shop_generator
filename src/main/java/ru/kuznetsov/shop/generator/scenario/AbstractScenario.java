@@ -8,6 +8,11 @@ import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static ru.kuznetsov.shop.generator.common.ConstValues.PARAMETER_LOGIN;
+import static ru.kuznetsov.shop.generator.common.ConstValues.PARAMETER_PASSWORD;
 
 public abstract class AbstractScenario implements Scenario {
 
@@ -27,10 +32,17 @@ public abstract class AbstractScenario implements Scenario {
         gateUseCaseService.runUseCase(useCase);
     }
 
-    protected TokenDto getToken(String login, String password) {
+
+    protected TokenDto getToken(Map<String, String> parameters, String defaultLogin, String defaultPassword) {
         logger.info("Getting token");
+        String login = getParameter(parameters, PARAMETER_LOGIN).orElse(defaultLogin);
+        String password = getParameter(parameters, PARAMETER_PASSWORD).orElse(defaultPassword);
         TokenDto token = runUseCaseWithReturn(new GetTokenUseCase(login, password)).get(0);
         logger.info("Token String: {}", token.getToken());
         return token;
+    }
+
+    protected static Optional<String> getParameter(Map<String, String> parameters, String paramName) {
+        return Optional.ofNullable(parameters.get(paramName));
     }
 }

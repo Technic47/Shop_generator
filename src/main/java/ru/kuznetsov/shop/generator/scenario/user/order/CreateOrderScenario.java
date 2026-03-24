@@ -36,10 +36,10 @@ public class CreateOrderScenario extends AbstractScenario {
     }
 
     @Override
-    public void run() {
+    public void run(Map<String, String> parameters) {
         logger.info("Start CreateOrderScenario");
 
-        TokenDto token = getToken(USER_LOGIN, USER_PASSWORD);
+        TokenDto token = getToken(parameters, USER_LOGIN, USER_PASSWORD);
         String tokenString = token.getToken();
 
         List<ProductCategoryDto> productCategoryDtos = getProductCategories(tokenString);

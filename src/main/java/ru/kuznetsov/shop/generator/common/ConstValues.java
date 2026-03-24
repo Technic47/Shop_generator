@@ -28,4 +28,7 @@ public interface ConstValues {
     String SELLER_PASSWORD = "1999";
     String SELLER2_LOGIN = "shop_seller2";
     String SELLER2_PASSWORD = "1999";
+
+    String PARAMETER_LOGIN = "login";
+    String PARAMETER_PASSWORD = "password";
 }

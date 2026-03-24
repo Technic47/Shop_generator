@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Configuration
 @EnableScheduling
 public class GeneratorConfig {
@@ -43,6 +46,11 @@ public class GeneratorConfig {
     @Qualifier("shipment")
     public WebClient getShipmentClient() {
         return getWebClient(SHIPMENT_MODULE_PORT);
+    }
+
+    @Bean
+    public ExecutorService  getExecutorService() {
+        return Executors.newFixedThreadPool(10);
     }
 
     private WebClient getWebClient(String port) {

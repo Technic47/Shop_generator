@@ -7,6 +7,8 @@ import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.address.GetAllAddressUseCase;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 
+import java.util.Map;
+
 import static ru.kuznetsov.shop.generator.common.ConstValues.ADMIN_LOGIN;
 import static ru.kuznetsov.shop.generator.common.ConstValues.ADMIN_PASSWORD;
 
@@ -18,7 +20,7 @@ public class GetAllAddressScenario extends AbstractScenario {
     }
 
     @Override
-    public void run() {
+    public void run(Map<String, String> parameters) {
         TokenDto token = runUseCaseWithReturn(new GetTokenUseCase(ADMIN_LOGIN, ADMIN_PASSWORD)).get(0);
         runUseCase(new GetAllAddressUseCase(token.getToken()));
     }

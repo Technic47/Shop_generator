@@ -16,6 +16,7 @@ import ru.kuznetsov.shop.represent.dto.order.OrderStatusDto;
 import ru.kuznetsov.shop.represent.enums.OrderStatusType;
 
 import java.util.List;
+import java.util.Map;
 
 import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_LOGIN;
 import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_PASSWORD;
@@ -34,10 +35,10 @@ public class ConfirmOrderDeliveryScenario extends AbstractScenario {
     }
 
     @Override
-    public void run() {
+    public void run(Map<String, String> parameters) {
         logger.info("Starting ConfirmOrderDeliveryScenario");
 
-        TokenDto token = getToken(SELLER_LOGIN, SELLER_PASSWORD);
+        TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
         logger.info("Getting user");

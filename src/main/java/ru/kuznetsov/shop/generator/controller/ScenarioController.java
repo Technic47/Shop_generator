@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kuznetsov.shop.generator.scenario.Scenario;
 
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/run")
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class ScenarioController {
         try {
             String beanName = scenario.substring(0, 1).toLowerCase() + scenario.substring(1);
             Scenario scenarioBean = (Scenario) context.getBean(beanName);
-            scenarioBean.run();
+            scenarioBean.run(Collections.emptyMap());
             return ResponseEntity.ok(true);
         } catch (Exception e) {
             logger.error(e.getMessage());

@@ -19,12 +19,10 @@ import ru.kuznetsov.shop.represent.dto.*;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.*;
+import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_LOGIN;
+import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_PASSWORD;
 
 @Component
 public class ProductStockUpdateScenario extends AbstractScenario {
@@ -41,10 +39,10 @@ public class ProductStockUpdateScenario extends AbstractScenario {
     }
 
     @Override
-    public void run() {
+    public void run(Map<String, String> parameters) {
         logger.info("Start ProductStockUpdateScenario");
 
-        TokenDto token = getToken(SELLER_LOGIN, SELLER_PASSWORD);
+        TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
         logger.info("Getting user");
@@ -181,7 +179,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
 
         for (int i = 0; i < amount; i++) {
             categoryDtoList.add(
-                    runUseCaseWithReturn(new CreateCategoryUseCase(tokenString,createProductCategory())).get(0)
+                    runUseCaseWithReturn(new CreateCategoryUseCase(tokenString, createProductCategory())).get(0)
             );
         }
 
