@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.service.PaymentUseCaseService;
-import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderPaidUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.GetOrdersByStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
@@ -15,11 +14,14 @@ import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 import ru.kuznetsov.shop.represent.dto.order.OrderStatusDto;
 import ru.kuznetsov.shop.represent.enums.OrderStatusType;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_LOGIN;
 import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_PASSWORD;
+import static ru.kuznetsov.shop.represent.common.GlobalConst.DATE_FORMAT;
 import static ru.kuznetsov.shop.represent.enums.OrderStatusType.ERROR;
 
 @Component
@@ -41,12 +43,19 @@ public class ConfirmOrderPaymentScenario extends AbstractScenario {
         TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
-        logger.info("Getting user");
-        UserDto userDto = runUseCaseWithReturn(new GetUserInfoUseCase(tokenString)).get(0);
-        logger.info("UserInfo: {}", userDto);
+        UserDto userDto = getUserInfo(tokenString);
 
         logger.info("Getting orders with status AWAIT_PAYMENT");
-        List<Long> orderIdList = runUseCaseWithReturn(new GetOrdersByStatusUseCase(tokenString, OrderStatusType.AWAIT_PAYMENT))
+        LocalDateTime now = LocalDateTime.now().minusDays(2);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+        List<Long> orderIdList = runUseCaseWithReturn(
+                new GetOrdersByStatusUseCase(
+                        tokenString,
+                        OrderStatusType.AWAIT_PAYMENT,
+                        now.format(formatter),
+                        "after")
+        )
                 .stream()
                 .map(OrderStatusDto::getOrderId)
                 .distinct()

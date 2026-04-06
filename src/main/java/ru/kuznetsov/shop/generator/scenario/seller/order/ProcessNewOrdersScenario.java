@@ -7,7 +7,6 @@ import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.scenario.seller.product.ProductStockUpdateScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.service.NotificationUseCaseService;
-import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.GetStockByReservationOrderIdUseCase;
 import ru.kuznetsov.shop.generator.usecase.notification.DeleteNotificationUseCase;
@@ -49,9 +48,7 @@ public class ProcessNewOrdersScenario extends AbstractScenario {
         TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
-        logger.info("Getting user");
-        UserDto userDto = runUseCaseWithReturn(new GetUserInfoUseCase(tokenString)).get(0);
-        logger.info("UserInfo: {}", userDto);
+        UserDto userDto = getUserInfo(tokenString);
 
         logger.info("Getting new order notifications");
         List<SellerNotificationDto> notifications = notificationUseCaseService.runUseCase(new GetNotificationByOwnerIdUseCase(userDto.getId().toString()));

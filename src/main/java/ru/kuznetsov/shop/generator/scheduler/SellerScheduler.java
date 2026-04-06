@@ -14,7 +14,7 @@ public class SellerScheduler extends AbstractScheduler {
         super(context, executor);
     }
 
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "0 0 */1 * * *")
     public void scheduleProductStockUpdateScenario() {
         executor.submit(() -> processScenario("ProductStockUpdateScenario", Collections.emptyMap()));
     }

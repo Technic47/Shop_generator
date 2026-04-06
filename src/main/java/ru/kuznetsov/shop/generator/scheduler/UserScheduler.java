@@ -17,7 +17,7 @@ public class UserScheduler extends AbstractScheduler {
         super(context, executor);
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     public void scheduleCreateOrderScenario() {
         var parameters = Map.of(
                 PARAMETER_LOGIN, USER_LOGIN,
@@ -27,7 +27,17 @@ public class UserScheduler extends AbstractScheduler {
                 PARAMETER_LOGIN, USER2_LOGIN,
                 PARAMETER_PASSWORD, USER2_PASSWORD
         );
+        var parameters3 = Map.of(
+                PARAMETER_LOGIN, USER3_LOGIN,
+                PARAMETER_PASSWORD, USER3_PASSWORD
+        );
+        var parameters4 = Map.of(
+                PARAMETER_LOGIN, USER4_LOGIN,
+                PARAMETER_PASSWORD, USER4_PASSWORD
+        );
         executor.submit(() -> processScenario("CreateOrderScenario", parameters));
         executor.submit(() -> processScenario("CreateOrderScenario", parameters2));
+        executor.submit(() -> processScenario("CreateOrderScenario", parameters3));
+        executor.submit(() -> processScenario("CreateOrderScenario", parameters4));
     }
 }

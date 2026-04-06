@@ -7,6 +7,7 @@ import ru.kuznetsov.shop.represent.dto.order.OrderStatusDto;
 import ru.kuznetsov.shop.represent.enums.OrderStatusType;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,14 @@ public class GetOrdersByStatusUseCase implements UseCase<OrderStatusDto> {
 
     private final String token;
     private final OrderStatusType status;
+    private final String dateTime;
+    private final String direction;
 
-    public GetOrdersByStatusUseCase(String token, OrderStatusType status) {
+    public GetOrdersByStatusUseCase(String token, OrderStatusType status, String dateTime, String direction) {
         this.token = token;
         this.status = status;
+        this.dateTime = dateTime;
+        this.direction = direction;
     }
 
     @Override
@@ -34,7 +39,13 @@ public class GetOrdersByStatusUseCase implements UseCase<OrderStatusDto> {
 
     @Override
     public Map<String, ?> getQueryParams() {
-        return Map.of("status", status);
+        Map<String, Object> queryParams = new HashMap<>(Collections.emptyMap());
+
+        if (status != null) queryParams.put("status", status);
+        if (dateTime != null) queryParams.put("dateTime", dateTime);
+        if (direction != null) queryParams.put("direction", direction);
+
+        return queryParams;
     }
 
     @Override

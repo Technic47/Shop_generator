@@ -23,6 +23,10 @@ public interface ConstValues {
     String USER_PASSWORD = "1999";
     String USER2_LOGIN = "shop_user2";
     String USER2_PASSWORD = "1999";
+    String USER3_LOGIN = "user1";
+    String USER3_PASSWORD = "new_user";
+    String USER4_LOGIN = "user2";
+    String USER4_PASSWORD = "new_user";
 
     String SELLER_LOGIN = "shop_seller";
     String SELLER_PASSWORD = "1999";
@@ -31,4 +35,9 @@ public interface ConstValues {
 
     String PARAMETER_LOGIN = "login";
     String PARAMETER_PASSWORD = "password";
+
+    int STORE_AMOUNT = 7;
+    int CATEGORY_AMOUNT = 10;
+    int PRODUCT_AMOUNT = 25;
+    int STORE_MAX_AMOUNT = 500;
 }

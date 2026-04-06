@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
-import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
-import ru.kuznetsov.shop.generator.usecase.entity.address.CreteAddressUseCase;
+import ru.kuznetsov.shop.generator.usecase.entity.address.CreateAddressUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.CreateProductBatchUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.GetProductsByCategoryOrOwnerUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product_category.CreateCategoryUseCase;
@@ -21,16 +20,10 @@ import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 
 import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_LOGIN;
-import static ru.kuznetsov.shop.generator.common.ConstValues.SELLER_PASSWORD;
+import static ru.kuznetsov.shop.generator.common.ConstValues.*;
 
 @Component
 public class ProductStockUpdateScenario extends AbstractScenario {
-
-    private static final int STORE_AMOUNT = 2;
-    private static final int CATEGORY_AMOUNT = 3;
-    private static final int PRODUCT_AMOUNT = 10;
-    private static final int STORE_MAX_AMOUNT = 150;
 
     Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
 
@@ -45,9 +38,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
 
-        logger.info("Getting user");
-        UserDto userDto = runUseCaseWithReturn(new GetUserInfoUseCase(tokenString)).get(0);
-        logger.info("UserInfo: {}", userDto);
+        UserDto userDto = getUserInfo(tokenString);
 
         UUID userId = userDto.getId();
 
@@ -55,7 +46,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         List<ProductCategoryDto> productCategories = getProductCategories(tokenString);
 
         //Добавить категорий, если отсутствуют
-        if (productCategories.isEmpty()) {
+        if (productCategories.isEmpty() || productCategories.size() < CATEGORY_AMOUNT) {
             productCategories = createProductCategories(tokenString, CATEGORY_AMOUNT);
         }
 
@@ -92,7 +83,10 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         //Добавить запасы в магазины
         for (StoreDto store : storeList) {
             for (ProductDto product : userProducts) {
-                List<StockDto> stockList = getStockList(tokenString, store.getId(), product.getId());
+                List<StockDto> stockList = getStockList(tokenString, store.getId(), product.getId())
+                        .stream()
+                        .filter(stock -> !stock.getIsReserved())
+                        .toList();
 
                 if (stockList.isEmpty()) {
                     createStock(tokenString, store.getName(), product.getId(), STORE_MAX_AMOUNT);
@@ -113,7 +107,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
     }
 
     private AddressDto createAddress(String tokenString) {
-        logger.info("Creating address for user");
+        logger.info("Creating address");
         Random random = new Random();
 
         AddressDto newAddress = new AddressDto(
@@ -122,7 +116,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                 String.valueOf(random.nextInt(100000))
         );
 
-        AddressDto createdAddress = runUseCaseWithReturn(new CreteAddressUseCase(tokenString, newAddress)).get(0);
+        AddressDto createdAddress = runUseCaseWithReturn(new CreateAddressUseCase(tokenString, newAddress)).get(0);
         logger.info("Address ID: {}", createdAddress.getId());
         return createdAddress;
     }
@@ -138,8 +132,9 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                 ownerId.toString()
         );
 
-        logger.info("Store ID: {}", newStore.getId());
-        return runUseCaseWithReturn(new CreteStoreUseCase(tokenString, newStore)).get(0);
+        StoreDto createdStore = runUseCaseWithReturn(new CreteStoreUseCase(tokenString, newStore)).get(0);
+        logger.info("Store ID: {}", createdStore.getId());
+        return createdStore;
     }
 
     private ProductDto getProduct(String category, String ownerId) {
@@ -218,7 +213,11 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         );
 
         StockDto stock = runUseCaseWithReturn(new CreateStockUseCase(tokenString, stockDto)).get(0);
-        logger.info("Stock created: {}", stock.getId());
+
+        if (stock != null && (stock.getAmount() != null && stockDto.getAmount() != 0)) {
+            logger.info("Stock created: id: {}, amount: {}", stock.getId(), stock.getAmount());
+        } else logger.error("Error while creating stock for store {} and product {}", storeName, productId);
+
         return stockDto;
     }
 }

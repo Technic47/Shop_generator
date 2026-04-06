@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
-import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.SaveOrderUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.GetProductCardsUseCasePageable;
 import ru.kuznetsov.shop.generator.usecase.entity.product_category.GetAllCategoriesUseCase;
@@ -21,8 +20,7 @@ import ru.kuznetsov.shop.represent.dto.util.ProductCardPage;
 
 import java.util.*;
 
-import static ru.kuznetsov.shop.generator.common.ConstValues.USER_LOGIN;
-import static ru.kuznetsov.shop.generator.common.ConstValues.USER_PASSWORD;
+import static ru.kuznetsov.shop.generator.common.ConstValues.*;
 import static ru.kuznetsov.shop.represent.enums.DeliveryType.ADDRESS;
 import static ru.kuznetsov.shop.represent.enums.PaymentType.CASH;
 
@@ -41,12 +39,14 @@ public class CreateOrderScenario extends AbstractScenario {
 
         TokenDto token = getToken(parameters, USER_LOGIN, USER_PASSWORD);
         String tokenString = token.getToken();
+        UserDto userDto = getUserInfo(tokenString);
+        Set<BucketItemDto> bucketList = new HashSet<>();
 
         List<ProductCategoryDto> productCategoryDtos = getProductCategories(tokenString);
         List<StoreDto> storeDtos = getStoreList(tokenString);
 
         String ownerId = storeDtos.get(0).getOwnerId();
-        Long categoryId = productCategoryDtos.get(0).getId();
+        Long categoryId = productCategoryDtos.get(new Random().nextInt(0, CATEGORY_AMOUNT)).getId();
 
         int page = 0;
         int pageSize = 5;
@@ -61,25 +61,37 @@ public class CreateOrderScenario extends AbstractScenario {
                 null
         );
 
-        Set<BucketItemDto> bucketList = new HashSet<>();
+        if (productCardPage.getTotalPages() > 1) {
+            int randomPage = new Random().nextInt(0, productCardPage.getTotalPages());
+            logger.info("Total pages is more then 1. Move to random page #{}", randomPage);
+
+            productCardPage = getProductCards(
+                    tokenString,
+                    ownerId,
+                    categoryId,
+                    randomPage,
+                    pageSize,
+                    null,
+                    null
+            );
+        }
 
         addRandomProductsToBucket(bucketList, productCardPage);
 
-        logger.info("Getting user");
-        UserDto userDto = runUseCaseWithReturn(new GetUserInfoUseCase(tokenString)).get(0);
-        logger.info("UserInfo: {}", userDto);
+        if (!bucketList.isEmpty()) {
+            logger.info("Creating order");
 
-        logger.info("Creating order");
+            OrderDto orderDto = new OrderDto();
+            orderDto.setDeliveryType(ADDRESS);
+            orderDto.setPaymentType(CASH);
+            orderDto.setCustomerDeliveryAddress("Test delivery address");
+            orderDto.setCustomerId(userDto.getId().toString());
+            orderDto.setBucket(bucketList);
 
-        OrderDto orderDto = new OrderDto();
-        orderDto.setDeliveryType(ADDRESS);
-        orderDto.setPaymentType(CASH);
-        orderDto.setCustomerDeliveryAddress("Test delivery address");
-        orderDto.setCustomerId(userDto.getId().toString());
-        orderDto.setBucket(bucketList);
-
-        OrderDto savedOrder = runUseCaseWithReturn(new SaveOrderUseCase(tokenString, orderDto)).get(0);
-        logger.info("Order saved: {}", savedOrder.getId());
+            OrderDto savedOrder = runUseCaseWithReturn(new SaveOrderUseCase(tokenString, orderDto)).get(0);
+            logger.info("Order saved: {}", savedOrder.getId());
+        } else
+            logger.info("No products in bucket. Order is not created");
 
         logger.info("Finished CreateOrderScenario");
     }
@@ -128,24 +140,27 @@ public class CreateOrderScenario extends AbstractScenario {
         int numberOfElements = productCardPage.getNumberOfElements();
         int productAmount;
 
-        if (numberOfElements == 1) {
-            productAmount = 1;
-        } else {
+        if (numberOfElements != 0) {
             productAmount = random.nextInt(1, numberOfElements);
-        }
+            logger.info("Product amount to add - {}", productAmount);
 
-        for (int i = 0; i < productAmount; i++) {
-            ProductCardDto productCardDto = productCardPage.getContent().get(random.nextInt(productAmount));
-            Integer totalAmount = productCardDto.getStock().values().stream().reduce(0, Integer::sum);
+            for (int i = 0; i < productAmount; i++) {
+                ProductCardDto productCardDto = productCardPage.getContent().get(random.nextInt(productAmount));
+                Map<String, Integer> productStock = productCardDto.getStock();
 
-            BucketItemDto bucket = new BucketItemDto();
-            bucket.setProductId(productCardDto.getId());
-            int amountToAdd = random.nextInt(totalAmount / 5);
-            bucket.setAmount(amountToAdd);
+                if (!productStock.isEmpty()) {
+                    Integer totalAmount = productStock.values().stream().reduce(0, Integer::sum);
 
-            bucketList.add(bucket);
-            logger.info("Product {} x{} added to bucket", productCardDto.getId(), amountToAdd);
+                    BucketItemDto bucket = new BucketItemDto();
+                    bucket.setProductId(productCardDto.getId());
+                    int amountToAdd = random.nextInt(totalAmount);
+                    bucket.setAmount(amountToAdd);
+
+                    bucketList.add(bucket);
+                    logger.info("Product {} x{} added to bucket", productCardDto.getId(), amountToAdd);
+                } else
+                    logger.info("Product {} stock is empty. Not added to bucket", productCardDto.getId());
+            }
         }
     }
-
 }

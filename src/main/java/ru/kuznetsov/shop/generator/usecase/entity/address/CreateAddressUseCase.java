@@ -11,12 +11,12 @@ import java.util.Map;
 
 import static ru.kuznetsov.shop.generator.common.ConstValues.ADDRESS_URI;
 
-public class CreteAddressUseCase implements UseCase<AddressDto> {
+public class CreateAddressUseCase implements UseCase<AddressDto> {
 
     private final String token;
     private final AddressDto address;
 
-    public CreteAddressUseCase(String token, AddressDto address) {
+    public CreateAddressUseCase(String token, AddressDto address) {
         this.token = token;
         this.address = address;
     }

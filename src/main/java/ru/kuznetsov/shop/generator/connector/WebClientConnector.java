@@ -61,11 +61,11 @@ public class WebClientConnector {
                 .ifModifiedSince(ZonedDateTime.now())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> {
-                    System.out.println("Логирование 4** ошибок");
+                    System.out.println("Клиентская ошибка: " + response.statusCode());
                     return response.bodyToMono(String.class).map(RuntimeException::new);
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, response -> {
-                    System.out.println("Логирование 5** ошибок");
+                    System.out.println("Ошибка сервера: " + response.statusCode());
                     return Mono.empty();
                 })
                 .bodyToFlux(clazz)

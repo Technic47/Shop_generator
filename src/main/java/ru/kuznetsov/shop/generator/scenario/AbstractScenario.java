@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.UseCase;
 import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
+import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
+import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,13 @@ public abstract class AbstractScenario implements Scenario {
         gateUseCaseService.runUseCase(useCase);
     }
 
+    protected UserDto getUserInfo(String tokenString){
+        logger.info("Getting user");
+        UserDto userDto = runUseCaseWithReturn(new GetUserInfoUseCase(tokenString)).get(0);
+        logger.info("UserInfo: {}, {}", userDto.getUsername(), userDto.getEmail());
+
+        return userDto;
+    }
 
     protected TokenDto getToken(Map<String, String> parameters, String defaultLogin, String defaultPassword) {
         logger.info("Getting token");
