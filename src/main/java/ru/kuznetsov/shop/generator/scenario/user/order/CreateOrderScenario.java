@@ -141,7 +141,7 @@ public class CreateOrderScenario extends AbstractScenario {
         int productAmount;
 
         if (numberOfElements != 0) {
-            productAmount = random.nextInt(1, numberOfElements);
+            productAmount = random.nextInt(1, Math.max(2, numberOfElements / 5));
             logger.info("Product amount to add - {}", productAmount);
 
             for (int i = 0; i < productAmount; i++) {

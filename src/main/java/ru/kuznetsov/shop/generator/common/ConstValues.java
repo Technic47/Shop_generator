@@ -39,5 +39,5 @@ public interface ConstValues {
     int STORE_AMOUNT = 7;
     int CATEGORY_AMOUNT = 10;
     int PRODUCT_AMOUNT = 25;
-    int STORE_MAX_AMOUNT = 500;
+    int STORE_MAX_AMOUNT = 5000;
 }

@@ -6,11 +6,12 @@ import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.service.ShipmentUseCaseService;
+import ru.kuznetsov.shop.generator.usecase.entity.order.OrderByStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderDeliveredUseCase;
-import ru.kuznetsov.shop.generator.usecase.entity.order.status.GetOrdersByStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
+import ru.kuznetsov.shop.represent.dto.order.OrderDto;
 import ru.kuznetsov.shop.represent.dto.order.OrderStatusDto;
 import ru.kuznetsov.shop.represent.enums.OrderStatusType;
 
@@ -46,18 +47,20 @@ public class ConfirmOrderDeliveryScenario extends AbstractScenario {
         UserDto userDto = getUserInfo(tokenString);
 
         logger.info("Getting orders with status SHIPPED");
-        LocalDateTime now = LocalDateTime.now().minusDays(2);
+        LocalDateTime dateAfter = LocalDateTime.now().minusDays(2);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
         List<Long> orderIdList = runUseCaseWithReturn(
-                new GetOrdersByStatusUseCase(
+                new OrderByStatusUseCase(
                         tokenString,
+                        null,
+                        dateAfter.format(formatter),
+                        null,
                         OrderStatusType.SHIPPED,
-                        now.format(formatter),
-                        "after")
+                        OrderStatusType.DELIVERED)
         )
                 .stream()
-                .map(OrderStatusDto::getOrderId)
+                .map(OrderDto::getId)
                 .distinct()
                 .toList();
         logger.info("Orders received: {}", orderIdList);
