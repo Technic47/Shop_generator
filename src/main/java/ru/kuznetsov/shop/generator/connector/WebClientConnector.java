@@ -1,10 +1,13 @@
 package ru.kuznetsov.shop.generator.connector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
@@ -26,6 +29,8 @@ public class WebClientConnector {
     private int MAX_ATTEMPTS;
 
     private final WebClient webClient;
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public WebClientConnector(WebClient webClient) {
         this.webClient = webClient;
@@ -61,11 +66,11 @@ public class WebClientConnector {
                 .ifModifiedSince(ZonedDateTime.now())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> {
-                    System.out.println("Клиентская ошибка: " + response.statusCode());
+                    logger.error(formClientErrorMessage(response, method, uri, queryParams, headersMap, clazz));
                     return response.bodyToMono(String.class).map(RuntimeException::new);
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, response -> {
-                    System.out.println("Ошибка сервера: " + response.statusCode());
+                    logger.error(formServerErrorMessage(response, method, uri, queryParams, headersMap, clazz));
                     return Mono.empty();
                 })
                 .bodyToFlux(clazz)
@@ -85,5 +90,60 @@ public class WebClientConnector {
                 })
                 .collectList();
         return mono.block();
+    }
+
+    private String formServerErrorMessage(ClientResponse response, HttpMethod method, String uri, Map<String, ?> queryParams, Map<String, List<String>> headersMap, Object body) {
+        return formErrorMessage(
+                "Ошибка сервера",
+                response,
+                method,
+                uri,
+                queryParams,
+                headersMap,
+                body
+        );
+    }
+
+    private String formClientErrorMessage(ClientResponse response, HttpMethod method, String uri, Map<String, ?> queryParams, Map<String, List<String>> headersMap, Object body) {
+        return formErrorMessage(
+                "Ошибка клиента",
+                response,
+                method,
+                uri,
+                queryParams,
+                headersMap,
+                body
+        );
+    }
+
+    private String formErrorMessage(String message, ClientResponse response, HttpMethod method, String uri, Map<String, ?> queryParams, Map<String, List<String>> headersMap, Object body) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(message).append(" ").append(response.statusCode()).append(" ")
+                .append("Method: ").append(method.toString()).append(" ").append("Uri: ").append(uri).append(" ");
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            builder.append("Params: ");
+            for (String key : queryParams.keySet()) {
+                builder.append(key).append(": ").append(queryParams.get(key));
+            }
+            builder.append(" ");
+        }
+
+        if (headersMap != null && !headersMap.isEmpty()) {
+            builder.append("Headers: ");
+            for (String key : headersMap.keySet()) {
+                builder.append(key).append(": ");
+                builder.append(key.contains("Authorization") ?
+                        "***" :
+                        headersMap.get(key));
+            }
+            builder.append(" ");
+        }
+
+        if (body != null) {
+            builder.append("Body: ").append(body);
+        }
+
+        return builder.toString();
     }
 }

@@ -3,6 +3,7 @@ package ru.kuznetsov.shop.generator.scheduler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -10,8 +11,8 @@ import java.util.concurrent.ExecutorService;
 @Component
 public class SellerScheduler extends AbstractScheduler {
 
-    protected SellerScheduler(ApplicationContext context, ExecutorService executor) {
-        super(context, executor);
+    protected SellerScheduler(ApplicationContext context, ExecutorService executor, ParameterService parameterService) {
+        super(context, executor, parameterService);
     }
 
     @Scheduled(cron = "0 0 */1 * * *")

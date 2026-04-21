@@ -19,12 +19,14 @@ public class GetOrdersByStatusUseCase implements UseCase<OrderStatusDto> {
     private final OrderStatusType status;
     private final String dateTime;
     private final String direction;
+    private final Integer limit;
 
-    public GetOrdersByStatusUseCase(String token, OrderStatusType status, String dateTime, String direction) {
+    public GetOrdersByStatusUseCase(String token, OrderStatusType status, String dateTime, String direction, Integer limit) {
         this.token = token;
         this.status = status;
         this.dateTime = dateTime;
         this.direction = direction;
+        this.limit = limit;
     }
 
     @Override
@@ -44,6 +46,7 @@ public class GetOrdersByStatusUseCase implements UseCase<OrderStatusDto> {
         if (status != null) queryParams.put("status", status);
         if (dateTime != null) queryParams.put("dateTime", dateTime);
         if (direction != null) queryParams.put("direction", direction);
+        if (limit != null) queryParams.put("limit", limit);
 
         return queryParams;
     }

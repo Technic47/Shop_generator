@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
-import ru.kuznetsov.shop.generator.scenario.seller.product.ProductStockUpdateScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.service.NotificationUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.GetStockByReservationOrderIdUseCase;
 import ru.kuznetsov.shop.generator.usecase.notification.DeleteNotificationUseCase;
 import ru.kuznetsov.shop.generator.usecase.notification.GetNotificationByOwnerIdUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.StockDto;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
@@ -34,10 +34,10 @@ public class ProcessNewOrdersScenario extends AbstractScenario {
 
     protected final NotificationUseCaseService notificationUseCaseService;
 
-    Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
+    Logger logger = LoggerFactory.getLogger(ProcessNewOrdersScenario.class);
 
-    protected ProcessNewOrdersScenario(GateUseCaseService gateUseCaseService, NotificationUseCaseService notificationUseCaseService) {
-        super(gateUseCaseService);
+    protected ProcessNewOrdersScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService, NotificationUseCaseService notificationUseCaseService) {
+        super(gateUseCaseService, parameterService);
         this.notificationUseCaseService = notificationUseCaseService;
     }
 

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import ru.kuznetsov.shop.generator.scenario.Scenario;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -12,12 +13,14 @@ public abstract class AbstractScheduler {
 
     protected final ApplicationContext context;
     protected final ExecutorService executor;
+    protected final ParameterService parameterService;
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected AbstractScheduler(ApplicationContext context, ExecutorService executor) {
+    protected AbstractScheduler(ApplicationContext context, ExecutorService executor, ParameterService parameterService) {
         this.context = context;
         this.executor = executor;
+        this.parameterService = parameterService;
     }
 
     protected void processScenario(String scenarioName, Map<String, String> parameters) {

@@ -2,8 +2,10 @@ package ru.kuznetsov.shop.generator.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -14,6 +16,8 @@ import java.util.concurrent.Executors;
 
 @Configuration
 @EnableScheduling
+@EnableJpaRepositories("ru.kuznetsov.shop.generator.repository")
+@EntityScan("ru.kuznetsov.shop.generator.model")
 public class GeneratorConfig {
 
     @Value("${microservices.baseUrl}")
@@ -49,7 +53,7 @@ public class GeneratorConfig {
     }
 
     @Bean
-    public ExecutorService  getExecutorService() {
+    public ExecutorService getExecutorService() {
         return Executors.newFixedThreadPool(10);
     }
 

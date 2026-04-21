@@ -14,6 +14,7 @@ import ru.kuznetsov.shop.generator.usecase.entity.stock.CreateStockUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.stock.GetStockUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.store.CreteStoreUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.store.GetAllStoresUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.*;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
@@ -27,13 +28,22 @@ public class ProductStockUpdateScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(ProductStockUpdateScenario.class);
 
-    protected ProductStockUpdateScenario(GateUseCaseService gateUseCaseService) {
-        super(gateUseCaseService);
+    protected ProductStockUpdateScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService) {
+        super(gateUseCaseService, parameterService);
     }
 
     @Override
     public void run(Map<String, String> parameters) {
         logger.info("Start ProductStockUpdateScenario");
+
+        int storeAmount = Integer.parseInt(parameterService.getParameterValueStringOrSaveDefault(
+                STORE_AMOUNT_PARAMETER, "7", "Количество демо магазинов"));
+        int categoryAmount = Integer.parseInt(parameterService.getParameterValueStringOrSaveDefault(
+                CATEGORY_AMOUNT_PARAMETER, "10", "Количество демо категорий"));
+        int productAmount = Integer.parseInt(parameterService.getParameterValueStringOrSaveDefault(
+                PRODUCT_AMOUNT_PARAMETER, "25", "Количество демо продуктов"));
+        int storeMaxAmount = Integer.parseInt(parameterService.getParameterValueStringOrSaveDefault(
+                STORE_MAX_AMOUNT_PARAMETER, "5000", "Максимальное количество демо запаса продуктов"));
 
         TokenDto token = getToken(parameters, SELLER_LOGIN, SELLER_PASSWORD);
         String tokenString = token.getToken();
@@ -46,8 +56,8 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         List<ProductCategoryDto> productCategories = getProductCategories(tokenString);
 
         //Добавить категорий, если отсутствуют
-        if (productCategories.isEmpty() || productCategories.size() < CATEGORY_AMOUNT) {
-            productCategories = createProductCategories(tokenString, CATEGORY_AMOUNT);
+        if (productCategories.isEmpty() || productCategories.size() < categoryAmount) {
+            productCategories = createProductCategories(tokenString, categoryAmount);
         }
 
         List<String> categoryIdList = productCategories.stream()
@@ -55,7 +65,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                 .toList();
 
         //Добавить магазины
-        while (storeList.size() < STORE_AMOUNT) {
+        while (storeList.size() < storeAmount) {
             AddressDto createdAddress = createAddress(tokenString);
             StoreDto createdStore = createStore(tokenString, createdAddress, userId);
             storeList.add(createdStore);
@@ -69,7 +79,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
         List<ProductDto> productsToCreate = new ArrayList<>();
 
         //Добавить товары
-        while (userProducts.size() + productsToCreate.size() < PRODUCT_AMOUNT) {
+        while (userProducts.size() + productsToCreate.size() < productAmount) {
             productsToCreate.add(getProduct(
                     categoryIdList.get(new Random().nextInt(categoryIdList.size())),
                     userId.toString()
@@ -89,7 +99,7 @@ public class ProductStockUpdateScenario extends AbstractScenario {
                         .toList();
 
                 if (stockList.isEmpty()) {
-                    createStock(tokenString, store.getName(), product.getId(), STORE_MAX_AMOUNT);
+                    createStock(tokenString, store.getName(), product.getId(), storeMaxAmount);
                 }
             }
         }

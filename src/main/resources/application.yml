@@ -1,6 +1,14 @@
 spring:
   application:
     name: Generator
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+  jpa:
+    generate-ddl: true
+    open-in-view: false
 
 
 logging:

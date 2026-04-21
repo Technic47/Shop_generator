@@ -9,6 +9,7 @@ import ru.kuznetsov.shop.generator.service.ShipmentUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderByStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderDeliveredUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 import ru.kuznetsov.shop.represent.dto.order.OrderDto;
@@ -32,8 +33,8 @@ public class ConfirmOrderDeliveryScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(ConfirmOrderDeliveryScenario.class);
 
-    protected ConfirmOrderDeliveryScenario(GateUseCaseService gateUseCaseService, ShipmentUseCaseService shipmentUseCaseService) {
-        super(gateUseCaseService);
+    protected ConfirmOrderDeliveryScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService, ShipmentUseCaseService shipmentUseCaseService) {
+        super(gateUseCaseService, parameterService);
         this.shipmentUseCaseService = shipmentUseCaseService;
     }
 

@@ -6,6 +6,7 @@ import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.UseCase;
 import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
 import ru.kuznetsov.shop.generator.usecase.auth.GetUserInfoUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 
@@ -19,11 +20,13 @@ import static ru.kuznetsov.shop.generator.common.ConstValues.PARAMETER_PASSWORD;
 public abstract class AbstractScenario implements Scenario {
 
     protected final GateUseCaseService gateUseCaseService;
+    protected final ParameterService parameterService;
 
     Logger logger = LoggerFactory.getLogger(AbstractScenario.class);
 
-    protected AbstractScenario(GateUseCaseService gateUseCaseService) {
+    protected AbstractScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService) {
         this.gateUseCaseService = gateUseCaseService;
+        this.parameterService = parameterService;
     }
 
     protected <T> List<T> runUseCaseWithReturn(UseCase<T> useCase) {

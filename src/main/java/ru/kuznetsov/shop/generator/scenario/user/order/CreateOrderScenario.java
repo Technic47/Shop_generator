@@ -9,6 +9,7 @@ import ru.kuznetsov.shop.generator.usecase.entity.order.SaveOrderUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.product.GetProductCardsUseCasePageable;
 import ru.kuznetsov.shop.generator.usecase.entity.product_category.GetAllCategoriesUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.store.GetAllStoresUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.ProductCardDto;
 import ru.kuznetsov.shop.represent.dto.ProductCategoryDto;
 import ru.kuznetsov.shop.represent.dto.StoreDto;
@@ -29,8 +30,8 @@ public class CreateOrderScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(CreateOrderScenario.class);
 
-    protected CreateOrderScenario(GateUseCaseService gateUseCaseService) {
-        super(gateUseCaseService);
+    protected CreateOrderScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService) {
+        super(gateUseCaseService, parameterService);
     }
 
     @Override
@@ -46,7 +47,9 @@ public class CreateOrderScenario extends AbstractScenario {
         List<StoreDto> storeDtos = getStoreList(tokenString);
 
         String ownerId = storeDtos.get(0).getOwnerId();
-        Long categoryId = productCategoryDtos.get(new Random().nextInt(0, CATEGORY_AMOUNT)).getId();
+        int categoryAmount = Integer.parseInt(parameterService.getParameterValueStringOrSaveDefault(
+                CATEGORY_AMOUNT_PARAMETER, "10", "Количество демо категорий"));
+        Long categoryId = productCategoryDtos.get(new Random().nextInt(0, categoryAmount)).getId();
 
         int page = 0;
         int pageSize = 5;

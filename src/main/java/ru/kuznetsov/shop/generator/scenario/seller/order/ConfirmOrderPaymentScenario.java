@@ -9,6 +9,7 @@ import ru.kuznetsov.shop.generator.service.PaymentUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderByStatusUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.OrderPaidUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.order.status.SaveOrderStatusUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 import ru.kuznetsov.shop.represent.dto.auth.UserDto;
 import ru.kuznetsov.shop.represent.dto.order.OrderDto;
@@ -32,8 +33,8 @@ public class ConfirmOrderPaymentScenario extends AbstractScenario {
 
     Logger logger = LoggerFactory.getLogger(ConfirmOrderPaymentScenario.class);
 
-    protected ConfirmOrderPaymentScenario(GateUseCaseService gateUseCaseService, PaymentUseCaseService paymentUseCaseService) {
-        super(gateUseCaseService);
+    protected ConfirmOrderPaymentScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService, PaymentUseCaseService paymentUseCaseService) {
+        super(gateUseCaseService, parameterService);
         this.paymentUseCaseService = paymentUseCaseService;
     }
 

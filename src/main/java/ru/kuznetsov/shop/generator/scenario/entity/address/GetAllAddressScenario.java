@@ -5,6 +5,7 @@ import ru.kuznetsov.shop.generator.scenario.AbstractScenario;
 import ru.kuznetsov.shop.generator.service.GateUseCaseService;
 import ru.kuznetsov.shop.generator.usecase.auth.GetTokenUseCase;
 import ru.kuznetsov.shop.generator.usecase.entity.address.GetAllAddressUseCase;
+import ru.kuznetsov.shop.parameter.service.ParameterService;
 import ru.kuznetsov.shop.represent.dto.auth.TokenDto;
 
 import java.util.Map;
@@ -15,8 +16,8 @@ import static ru.kuznetsov.shop.generator.common.ConstValues.ADMIN_PASSWORD;
 @Component
 public class GetAllAddressScenario extends AbstractScenario {
 
-    protected GetAllAddressScenario(GateUseCaseService gateUseCaseService) {
-        super(gateUseCaseService);
+    protected GetAllAddressScenario(GateUseCaseService gateUseCaseService, ParameterService parameterService) {
+        super(gateUseCaseService, parameterService);
     }
 
     @Override

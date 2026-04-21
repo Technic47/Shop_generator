@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.technic47</groupId>
         <artifactId>shop-spring-boot-starter</artifactId>
-        <version>1.1.16</version>
+        <version>1.1.18</version>
     </parent>
 
     <groupId>ru.kuznetsov.shop</groupId>
@@ -28,11 +28,24 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.github.technic47</groupId>
             <artifactId>data-model-dto</artifactId>
             <version>${data-model-dto.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.technic47</groupId>
+            <artifactId>parameter</artifactId>
+            <version>1.0.2</version>
         </dependency>
 
         <dependency>
